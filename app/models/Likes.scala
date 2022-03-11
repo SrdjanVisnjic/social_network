@@ -1,3 +1,3 @@
 package models
 
-case class Likes()
+case class Likes(userId: Long, postId: Long)

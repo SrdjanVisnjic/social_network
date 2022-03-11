@@ -15,7 +15,7 @@
                               implicit executionContext: ExecutionContext
                             ) extends HasDatabaseConfigProvider[JdbcProfile]{
    import profile.api._
-  private class UserTable(tag:Tag) extends Table[User](tag, "user"){
+   private class UserTable(tag:Tag) extends Table[User](tag, "user"){
 
 
     def id = column[Long]( "id", O.PrimaryKey, O.AutoInc)

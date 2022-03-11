@@ -11,9 +11,13 @@ import javax.inject.Inject
 
 class UserRepo @Inject()(tableMapping: TableMapping, protected val dbConfigProvider: DatabaseConfigProvider) extends HasDatabaseConfigProvider[JdbcProfile] {
   val users = tableMapping.users
+  import profile.api._
   def insert(user: User) = {
    db.run(
-     DBIO.seq(users += user)
+     users += user
    )
+  }
+  def findById(id: Long): Unit ={
+    db.run((for (user <- users if user.id ===id) yield  user).result.headOption)
   }
 }

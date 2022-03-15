@@ -9,7 +9,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 
 class UserRepo @Inject()(tableMapping: TableMapping, protected val dbConfigProvider: DatabaseConfigProvider) extends HasDatabaseConfigProvider[JdbcProfile] {
   import  profile.api._
-  val users = tableMapping.users
+  private val users = tableMapping.users
 
   def insert(user: User) = {
    db.run(

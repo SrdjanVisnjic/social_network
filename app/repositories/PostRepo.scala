@@ -11,7 +11,7 @@ import scala.concurrent.Future
 
 class PostRepo @Inject()(tableMapping: TableMapping, protected val dbConfigProvider: DatabaseConfigProvider) extends HasDatabaseConfigProvider[JdbcProfile]{
   import  profile.api._
-  val posts = tableMapping.posts
+  private val posts = tableMapping.posts
 
 
   def insert(post : Post) ={

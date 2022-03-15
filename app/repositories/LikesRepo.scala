@@ -11,7 +11,7 @@ import javax.inject.Inject
 
 class LikesRepo @Inject()(tableMapping: TableMapping, protected val dbConfigProvider: DatabaseConfigProvider) extends HasDatabaseConfigProvider[JdbcProfile]{
   import  profile.api._
-  val likes = tableMapping.likes
+  private val likes = tableMapping.likes
 
 
   def insert(like: Likes): Unit ={

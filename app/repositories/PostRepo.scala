@@ -4,16 +4,18 @@ import mapping.TableMapping
 import models.Post
 import play.api.db.slick.{DatabaseConfigProvider, HasDatabaseConfigProvider}
 import slick.jdbc.JdbcProfile
-import scala.concurrent.ExecutionContext.Implicits.global
 
+import scala.concurrent.ExecutionContext.Implicits.global
 import javax.inject.Inject
+import scala.concurrent.Future
 
 class PostRepo @Inject()(tableMapping: TableMapping, protected val dbConfigProvider: DatabaseConfigProvider) extends HasDatabaseConfigProvider[JdbcProfile]{
+  import  profile.api._
   val posts = tableMapping.posts
-  import profile.api._
 
-  def insert(post : Post): Unit ={
-    db.run(posts += post)
+
+  def insert(post : Post) ={
+    db.run((posts returning posts.map(_.id)).insertOrUpdate(post))
   }
 
   def findById(id: Long): Unit ={

@@ -7,7 +7,10 @@ import repositories.UserRepo
 import javax.inject.Inject
 
 class UserService @Inject()(userRepo: UserRepo) {
-  def createUser(user: User): Unit = {
+  def createUser(user: User) = {
     userRepo.insert(user)
+  }
+  def findById(id : Long) = {
+    userRepo.findById(id)
   }
 }

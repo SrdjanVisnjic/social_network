@@ -8,14 +8,16 @@ import javax.inject.Inject
 import scala.concurrent.ExecutionContext.Implicits.global
 
 class UserRepo @Inject()(tableMapping: TableMapping, protected val dbConfigProvider: DatabaseConfigProvider) extends HasDatabaseConfigProvider[JdbcProfile] {
+  import  profile.api._
   val users = tableMapping.users
-  import profile.api._
+
   def insert(user: User) = {
    db.run(
      users += user
    )
+    db.run((for (u <- users if u.username === user.username) yield u).result.headOption)
   }
-  def findById(id: Long): Unit ={
+  def findById(id: Long) ={
     db.run((for (user <- users if user.id ===id) yield  user).result.headOption)
   }
   def delete(id: Long) {
@@ -24,11 +26,11 @@ class UserRepo @Inject()(tableMapping: TableMapping, protected val dbConfigProvi
     }
   }
 
-  def updateProfilePicture(id: Long , profilePicture: String): Unit ={
+  def updateProfilePicture(id: Long , profilePicture: String) ={
     val query = for (user <- users if user.id === id) yield user.profilePicture
     db.run(query.update(profilePicture)) map {_ > 0}
   }
-  def updateAbout(id: Long , about: String): Unit ={
+  def updateAbout(id: Long , about: String) ={
     val query = for (user <- users if user.id === id) yield user.about
     db.run(query.update(about)) map {_ > 0}
   }

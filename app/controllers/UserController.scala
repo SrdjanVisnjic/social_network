@@ -1,16 +1,20 @@
 package controllers
+import akka.http.scaladsl.model.HttpHeader.ParsingResult.Ok
 import models.User
-import play._
 import play.api.libs.json.{JsError, JsSuccess}
-import play.api.mvc.BaseController
+import play.api.mvc.{Action, AnyContent, BaseController, ControllerComponents}
 import play.api.libs.json._
-import play.api.mvc.Results.BadRequest
-import play.mvc._
+import play.api.mvc.Results.Ok
 import services.UserService
 
-class UserController extends BaseController {
-  def create () = Action { implicit request => request.body.asJson.validate[User] match {
-    case JsSuccess(user: User) => UserService.createUser(user)
-    case JsError => BadRequest("Bad user input")
+import javax.inject.Inject
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
+
+class UserController @Inject()(val controllerComponents: ControllerComponents, val userService: UserService) extends BaseController {
+  def create: Action[AnyContent]= Action.async{ implicit request => request.body.asJson.get.validate[User] match {
+    case JsSuccess(user,_) => userService.createUser(user)
+      Future(Ok(Json.toJson(user)))
+    case JsError(err) => Future(BadRequest("Invalid data"))
   }}
 }

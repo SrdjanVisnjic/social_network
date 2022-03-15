@@ -10,13 +10,14 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import javax.inject.Inject
 
 class LikesRepo @Inject()(tableMapping: TableMapping, protected val dbConfigProvider: DatabaseConfigProvider) extends HasDatabaseConfigProvider[JdbcProfile]{
-  val likes = tableMapping.likes
   import  profile.api._
+  val likes = tableMapping.likes
+
 
   def insert(like: Likes): Unit ={
     db.run(likes += like)
   }
   def delete(userId: Long, postId: Long): Unit ={
-    db.run(likes.filter(_.userFk == userId ).filter(_.postFk == postId).delete) map{ _ > 0}
+    db.run(likes.filter(_.userId === userId ).filter(_.postId === postId).delete) map{ _ > 0}
   }
 }

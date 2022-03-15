@@ -15,7 +15,12 @@
                               implicit executionContext: ExecutionContext
                             ) extends HasDatabaseConfigProvider[JdbcProfile]{
    import profile.api._
-   private class UserTable(tag:Tag) extends Table[User](tag, "user"){
+   val users = TableQuery[UserTable]
+   val posts = TableQuery[PostTable]
+   val likes = TableQuery[LikesTable]
+   val userfriends = TableQuery[UserFriendTable]
+
+    class UserTable(tag:Tag) extends Table[User](tag, "user"){
 
 
     def id = column[Long]( "id", O.PrimaryKey, O.AutoInc)
@@ -31,11 +36,11 @@
     def userNameIndex = index("uq_userName", username, true)
     def emailIndex = index("uq_email", email, true)
 
-    def * =(id,username,password,email,name,lastname,dateOfBirth,about,profilePicture)<> (User.tupled, User.unapply)
+    def * =(id,username,password,email,name,lastname,dateOfBirth,about,profilePicture)<> ((User.apply _).tupled, User.unapply)
   }
-  val users = TableQuery[UserTable]
 
-  private class PostTable(tag: Tag) extends  Table[Post](tag, "post"){
+
+   class PostTable(tag: Tag) extends  Table[Post](tag, "post"){
 
     def id = column[Long]("id", O.PrimaryKey, O.AutoInc)
     def messsage = column[String]("message")
@@ -49,9 +54,9 @@
 
     def * =(id,userId,messsage,createdAt,editedAt)<>(Post.tupled, Post.unapply)
   }
- val posts = TableQuery[PostTable]
 
- private class LikesTable(tag: Tag) extends Table[Likes](tag, "likes"){
+
+  class LikesTable(tag: Tag) extends Table[Likes](tag, "likes"){
    def userId = column[Long]("userId")
    def postId = column[Long]("postId")
 
@@ -63,9 +68,9 @@
 
    def * = (userId,postId)<>(Likes.tupled, Likes.unapply)
  }
- val likes = TableQuery[LikesTable]
 
- private class UserFriendTable(tag: Tag) extends Table[UserFriend](tag, "userFriend"){
+
+  class UserFriendTable(tag: Tag) extends Table[UserFriend](tag, "userFriend"){
    def id = column[Long]("id", O.PrimaryKey, O.AutoInc)
    def sourceId = column[Long]("sourceId")
    def targetId = column[Long]("targetId")
@@ -80,6 +85,5 @@
 
    def * = (id,sourceId,targetId,createdAt,status)<>(UserFriend.tupled, UserFriend.unapply)
  }
- val userfriends = TableQuery[UserFriendTable]
 }
 

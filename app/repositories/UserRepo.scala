@@ -1,6 +1,7 @@
 package repositories
+import akka.actor.Status.Success
 import mapping.TableMapping
-import models.User
+import models.{User, UserDTO}
 import play.api.db.slick.{DatabaseConfigProvider, HasDatabaseConfigProvider}
 import slick.jdbc.JdbcProfile
 
@@ -28,8 +29,8 @@ class UserRepo @Inject()(tableMapping: TableMapping, protected val dbConfigProvi
     val query = for (user <- users if user.id === id) yield user.profilePicture
     db.run(query.update(profilePicture)) map {_ > 0}
   }
-  def updateAbout(id: Long , about: String) ={
-    val query = for (user <- users if user.id === id) yield user.about
-    db.run(query.update(about)) map {_ > 0}
+  def update(id: Long , userDto: UserDTO) ={
+    val odlUser = findById(id)
+    db.run(update(userDto.username.getOrElse(odlUser.username))) //??????????????????????????????????????
   }
 }

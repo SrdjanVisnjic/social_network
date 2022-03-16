@@ -1,5 +1,5 @@
 package controllers
-import models.User
+import models.{User, UserDTO}
 import play.api.libs.json.Format.GenericFormat
 import play.api.libs.json.{JsError, JsSuccess}
 import play.api.mvc.{Action, AnyContent, BaseController, ControllerComponents}
@@ -27,14 +27,14 @@ class UserController @Inject()(val controllerComponents: ControllerComponents, v
       case None => NotFound
     }
   }
- /* def updateAbout(userId: Long) = Action.async {
+  def update(userId: Long) = Action.async {
   implicit request =>
-     request.body.asJson.get.asOpt[String] match{
-       case Some(str) => userService.updateAbout(userId, str)
-        Future(Ok("Updated about"))
-       case None => Future(BadRequest)
+     request.body.asJson.get.validate[UserDTO] match{
+       case JsSuccess(userDto,_)=>userService.update(userId,userDto)
+        Future(Ok("User updated"))
+       case JsError(err) => Future(BadRequest("Error updating user"))
      }
-  } */
+  }
 
     def updateProfilePicture(userId:Long) = Action.async(parse.multipartFormData){
       implicit request => request.body.file("profilePicture").map{ picture =>
@@ -48,7 +48,7 @@ class UserController @Inject()(val controllerComponents: ControllerComponents, v
         }
 
       }.getOrElse{
-        BadRequest("File not found")
+        Future(BadRequest("File not found"))
       }
     }
 

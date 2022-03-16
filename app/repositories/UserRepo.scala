@@ -12,10 +12,8 @@ class UserRepo @Inject()(tableMapping: TableMapping, protected val dbConfigProvi
   private val users = tableMapping.users
 
   def insert(user: User) = {
-   db.run(
-     users += user
-   )
-    db.run((for (u <- users if u.username === user.username) yield u).result.headOption)
+    val insertQuery = (users returning users.map(_.id)).insertOrUpdate(user)
+    dbConfig.db.run(insertQuery)
   }
   def findById(id: Long) ={
     db.run((for (user <- users if user.id ===id) yield  user).result.headOption)

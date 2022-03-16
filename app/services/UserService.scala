@@ -13,4 +13,10 @@ class UserService @Inject()(userRepo: UserRepo) {
   def findById(id : Long) = {
     userRepo.findById(id)
   }
+  def updateAbout(id: Long, about: String)= {
+    userRepo.updateAbout(id, about)
+  }
+  def updateProfilePic(id: Long, pfp: String) ={
+    userRepo.updateProfilePicture(id,pfp)
+  }
 }

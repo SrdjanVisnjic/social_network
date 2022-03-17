@@ -1,7 +1,8 @@
 package repositories
 import akka.actor.Status.Success
+import dto.UserDTO
 import mapping.TableMapping
-import models.{User, UserDTO}
+import models.User
 import play.api.db.slick.{DatabaseConfigProvider, HasDatabaseConfigProvider}
 import slick.jdbc.JdbcProfile
 

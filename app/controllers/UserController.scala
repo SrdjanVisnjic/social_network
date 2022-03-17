@@ -1,5 +1,6 @@
 package controllers
-import models.{User, UserDTO}
+import dto.UserDTO
+import models.User
 import play.api.libs.json.Format.GenericFormat
 import play.api.libs.json.{JsError, JsSuccess}
 import play.api.mvc.{Action, AnyContent, BaseController, ControllerComponents}

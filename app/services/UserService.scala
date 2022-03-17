@@ -1,6 +1,7 @@
 package services
 
-import models.{User, UserDTO}
+import dto.UserDTO
+import models.User
 import play.api.libs.json._
 import repositories.UserRepo
 

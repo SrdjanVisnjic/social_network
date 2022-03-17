@@ -15,6 +15,8 @@ class PostRepo @Inject()(tableMapping: TableMapping, protected val dbConfigProvi
   import  profile.api._
 
   private val posts = tableMapping.posts
+  private val userfriends = tableMapping.userfriends
+  private val users = tableMapping.users
 
   def insert(post : Post) ={
     db.run((posts returning posts.map(_.id)).insertOrUpdate(post))
@@ -33,6 +35,10 @@ class PostRepo @Inject()(tableMapping: TableMapping, protected val dbConfigProvi
     db.run(query.update(postdto.message,editedAt)) map {_>0}
   }
   def getPostsByUser(userId : Long) ={
-    db.run((for (post <- posts if post.userId === userId) yield post).result)
+    db.run(for{
+      friendship <- userfriends if friendship.status > 0 && (friendship.sourceId === userId || friendship.targetId ===userId)
+      user <- users if user.id === friendship.id && users.filter(_.id =!= userId)
+
+    } yield())
   }
 }

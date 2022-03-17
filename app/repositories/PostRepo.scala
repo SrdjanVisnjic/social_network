@@ -24,12 +24,15 @@ class PostRepo @Inject()(tableMapping: TableMapping, protected val dbConfigProvi
     db.run((for (post <- posts if post.id === id) yield  post).result.headOption)
   }
 
-  def delete(id: Long) {
+  def delete(id: Long) ={
     db.run(posts.filter(_.id === id).delete) map {_ > 0}
   }
 
   def edit(id: Long, postdto: PostDTO, editedAt: String) ={
     val query = for(post <- posts if post.id === id) yield (post.messsage,post.editedAt)
     db.run(query.update(postdto.message,editedAt)) map {_>0}
+  }
+  def getPostsByUser(userId : Long) ={
+    db.run((for (post <- posts if post.userId === userId) yield post).result)
   }
 }

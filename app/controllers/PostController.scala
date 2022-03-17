@@ -16,7 +16,8 @@ class PostController @Inject()(val controllerComponents: ControllerComponents, v
     case JsSuccess(post,_) => postService.createPost(post)
       Future(Ok(Json.toJson(post)))
     case JsError(err) => Future(BadRequest("Invalid data"))
-  }}
+    }
+  }
 
   def updatePost(postId: Long): Action[AnyContent] = Action.async{
     implicit  request =>  request.body.asJson.get.validate[PostDTO] match {
@@ -24,8 +25,19 @@ class PostController @Inject()(val controllerComponents: ControllerComponents, v
         Future(Ok("Post updated"))
       case JsError(err)=> Future(BadRequest("Invalid message"))
     }
+  }
 
+  def deletePost(postId: Long) = Action.async{
+    implicit request => postService.deletePost(postId).map{
+      case true => Ok("Post deleted")
+      case _ => BadRequest("Error deleting post")
+    }
+  }
 
+  def allPostsByUser(userId: Long) = Action.async{
+    implicit request => val listOfPosts = postService.getPostsByUser(userId)
+      listOfPosts.map(seq => Ok(Json.toJson(seq))
+      )
 
   }
 }

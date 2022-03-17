@@ -14,4 +14,10 @@ class PostService @Inject()(postRepo: PostRepo){
   def updatePost(id: Long, postDto: PostDTO) ={
     postRepo.edit(id,postDto,DateTime.now().toString("yyyy-MM-dd"))
   }
+  def deletePost(id: Long) ={
+    postRepo.delete(id)
+  }
+  def getPostsByUser(userId: Long)= {
+    postRepo.getPostsByUser(userId)
+  }
 }

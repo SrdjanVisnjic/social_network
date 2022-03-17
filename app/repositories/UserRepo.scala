@@ -29,8 +29,9 @@ class UserRepo @Inject()(tableMapping: TableMapping, protected val dbConfigProvi
     val query = for (user <- users if user.id === id) yield user.profilePicture
     db.run(query.update(profilePicture)) map {_ > 0}
   }
-  def update(id: Long , userDto: UserDTO) ={
-    val odlUser = findById(id)
-    db.run(update(userDto.username.getOrElse(odlUser.username))) //??????????????????????????????????????
+  def updateInfo(id: Long , userDto: UserDTO) ={
+    db.run(users.filter(user => user.id === id)
+      .map(u=>(u.username,u.email,u.name,u.lastname,u.dateOfBirth,u.about))
+      .update(userDto.username, userDto.email,userDto.name,userDto.lastname, userDto.dateOfBirth,userDto.about))
   }
 }

@@ -25,6 +25,9 @@ class UserRepo @Inject()(tableMapping: TableMapping, protected val dbConfigProvi
       _ > 0
     }
   }
+  def searchUser(name: String, lastname: String)={
+    db.run((for(user <- users if user.name === name && user.lastname===lastname ) yield user).result)
+  }
 
   def updateProfilePicture(id: Long , profilePicture: String) ={
     val query = for (user <- users if user.id === id) yield user.profilePicture

@@ -37,20 +37,26 @@ class UserController @Inject()(val controllerComponents: ControllerComponents, v
      }
   }
 
-    def updateProfilePicture(userId:Long) = Action.async(parse.multipartFormData){
-      implicit request => request.body.file("profilePicture").map{ picture =>
-        val filename = Paths.get(picture.filename).getFileName
-        val fileSize = picture.fileSize
-        val contentType = picture.contentType
-        picture.ref.copyTo(Paths.get(s"/tmp/picture/$filename"), replace = true)
-        userService.updateProfilePic(userId,picture.filename).map{
-          case true => Ok("File uploaded")
-          case _ => BadRequest("File not found")
-        }
-
-      }.getOrElse{
-        Future(BadRequest("File not found"))
+  def updateProfilePicture(userId:Long) = Action.async(parse.multipartFormData){
+    implicit request => request.body.file("profilePicture").map{ picture =>
+      val filename = Paths.get(picture.filename).getFileName
+      val fileSize = picture.fileSize
+      val contentType = picture.contentType
+      picture.ref.copyTo(Paths.get(s"/tmp/picture/$filename"), replace = true)
+      userService.updateProfilePic(userId,picture.filename).map{
+        case true => Ok("File uploaded")
+        case _ => BadRequest("File not found")
       }
+    }.getOrElse{
+      Future(BadRequest("File not found"))
     }
+  }
+
+  def search(name:String,lastname:String)= Action.async{
+    val listOfUsers = userService.searchUser(name, lastname)
+    listOfUsers.map(seq => Ok(Json.toJson(seq))).recover{
+      case _:Exception => InternalServerError("error searching")
+    }
+  }
 
 }

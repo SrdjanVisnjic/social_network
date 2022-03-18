@@ -20,4 +20,7 @@ class UserService @Inject()(userRepo: UserRepo) {
   def updateProfilePic(id: Long, pfp: String) ={
     userRepo.updateProfilePicture(id,pfp)
   }
+  def searchUser(name:String,lastname:String)={
+    userRepo.searchUser(name, lastname)
+  }
 }

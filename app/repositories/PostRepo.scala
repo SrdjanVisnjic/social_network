@@ -35,10 +35,10 @@ class PostRepo @Inject()(tableMapping: TableMapping, protected val dbConfigProvi
     db.run(query.update(postdto.message,editedAt)) map {_>0}
   }
   def getPostsByUser(userId : Long) ={
-    db.run(for{
+    db.run((for{
       friendship <- userfriends if friendship.status > 0 && (friendship.sourceId === userId || friendship.targetId ===userId)
-      user <- users if user.id === friendship.id && users.filter(_.id =!= userId)
-
-    } yield())
+      user <- users if(!(user.id === userId) && ((user.id ===friendship.sourceId) || (user.id === friendship.targetId)))
+      post <- posts if post.userId === user.id
+    } yield(post.id, post.messsage, post.createdAt, post.editedAt,user.username, user.name, user.lastname, user.id)).result)
   }
 }

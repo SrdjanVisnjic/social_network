@@ -17,6 +17,7 @@ class PostRepo @Inject()(tableMapping: TableMapping, protected val dbConfigProvi
   private val posts = tableMapping.posts
   private val userfriends = tableMapping.userfriends
   private val users = tableMapping.users
+  private val likes = tableMapping.likes
 
   def insert(post : Post) ={
     db.run((posts returning posts.map(_.id)).insertOrUpdate(post))
@@ -39,6 +40,7 @@ class PostRepo @Inject()(tableMapping: TableMapping, protected val dbConfigProvi
       friendship <- userfriends if friendship.status > 0 && (friendship.sourceId === userId || friendship.targetId ===userId)
       user <- users if(!(user.id === userId) && ((user.id ===friendship.sourceId) || (user.id === friendship.targetId)))
       post <- posts if post.userId === user.id
-    } yield(post.id, post.messsage, post.createdAt, post.editedAt,user.username, user.name, user.lastname, user.id)).result)
+      likeCount = likes.filter(_.postId===post.id).length
+    } yield(post.id, post.messsage, post.createdAt, post.editedAt,user.username, user.name, user.lastname, user.id,likeCount)).result)
   }
 }

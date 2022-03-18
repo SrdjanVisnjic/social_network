@@ -4,10 +4,9 @@ import mapping.TableMapping
 import models.Likes
 import play.api.db.slick.{DatabaseConfigProvider, HasDatabaseConfigProvider}
 import slick.jdbc.JdbcProfile
+
+import java.sql.SQLIntegrityConstraintViolationException
 import scala.concurrent.ExecutionContext.Implicits.global
-
-
-
 import javax.inject.Inject
 
 class LikesRepo @Inject()(tableMapping: TableMapping, protected val dbConfigProvider: DatabaseConfigProvider) extends HasDatabaseConfigProvider[JdbcProfile]{
@@ -17,11 +16,17 @@ class LikesRepo @Inject()(tableMapping: TableMapping, protected val dbConfigProv
 
 
 
-  def insert(like: Likes) ={
-    db.run(likes += like)
+  def insert(userId:Long, postId:Long) ={
+    db.run(likes += Likes(userId,postId)).map(_=> "Post liked").recover{
+      case _: SQLIntegrityConstraintViolationException => throw new Exception("Already liked")
+      case ex: Exception => throw ex
+    }
   }
-  def delete(like: Likes) ={
-    db.run(likes.filter(_.userId === like.userId ).filter(_.postId === like.postId).delete) map{ _ > 0}
+  def delete(userId:Long, postId:Long) ={
+    db.run(likes.filter(like => like.userId===userId &&like.postId===postId).delete)
+      .map(result => {if (result == 1) "Post disliked" else throw new Exception("This post wasnt liked")}).recover{
+      case ex: Exception => throw ex
+    }
   }
   def findPostLikes(postId: Long) ={
     likes.filter(_.postId === postId).length

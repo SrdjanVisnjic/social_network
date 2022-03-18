@@ -13,10 +13,7 @@ libraryDependencies += "mysql" % "mysql-connector-java" % "8.0.28"
 libraryDependencies += "com.typesafe.play" %% "play-slick" % "5.0.0"
 libraryDependencies += "com.typesafe.play" %% "play-slick-evolutions" % "5.0.0"
 libraryDependencies += "mysql" % "mysql-connector-java" % "8.0.25"
-libraryDependencies ++= Seq(
-  jdbc,
-  "org.playframework.anorm" %% "anorm" % "2.6.10"
-)
+
 
 
 // Adds additional packages into Twirl

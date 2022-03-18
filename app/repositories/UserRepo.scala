@@ -20,7 +20,7 @@ class UserRepo @Inject()(tableMapping: TableMapping, protected val dbConfigProvi
   def findById(id: Long) ={
     db.run((for (user <- users if user.id ===id) yield  user).result.headOption)
   }
-  def delete(id: Long) {
+  def delete(id: Long)={
     db.run(users.filter(_.id === id).delete) map {
       _ > 0
     }
@@ -36,6 +36,6 @@ class UserRepo @Inject()(tableMapping: TableMapping, protected val dbConfigProvi
   def updateInfo(id: Long , userDto: UserDTO) ={
     db.run(users.filter(user => user.id === id)
       .map(u=>(u.username,u.email,u.name,u.lastname,u.dateOfBirth,u.about))
-      .update(userDto.username, userDto.email,userDto.name,userDto.lastname, userDto.dateOfBirth,userDto.about)) map {_ > 0}
+      .update(userDto.username, userDto.email,userDto.name,userDto.lastname, userDto.dateOfBirth,userDto.about))
   }
 }

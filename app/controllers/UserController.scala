@@ -31,8 +31,11 @@ class UserController @Inject()(val controllerComponents: ControllerComponents, v
   def update(userId: Long) = Action.async {
   implicit request =>
      request.body.asJson.get.validate[UserDTO] match{
-       case JsSuccess(userDto,_)=>userService.update(userId,userDto)
-        Future(Ok("User updated"))
+       case JsSuccess(userDto,_)=>userService.update(userId,userDto).map{
+         case 1 => Ok("User updated")
+         case 0 => BadRequest("error")
+       }
+         //Future(Ok("User updated"))
        case JsError(err) => Future(BadRequest("Error updating user"))
      }
   }
@@ -42,7 +45,7 @@ class UserController @Inject()(val controllerComponents: ControllerComponents, v
       val filename = Paths.get(picture.filename).getFileName
       val fileSize = picture.fileSize
       val contentType = picture.contentType
-      picture.ref.copyTo(Paths.get(s"/tmp/picture/$filename"), replace = true)
+      picture.ref.moveTo(Paths.get(s"C:/Users/Srdjan/SocialNetwork/social_network/public/images/$filename").toFile, replace = true)
       userService.updateProfilePic(userId,picture.filename).map{
         case true => Ok("File uploaded")
         case _ => BadRequest("File not found")

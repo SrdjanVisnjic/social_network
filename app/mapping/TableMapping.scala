@@ -52,7 +52,7 @@
 
     def userIndex = index("idx_post_user", userId, false)
 
-    def * =(id,userId,messsage,createdAt,editedAt)<>(Post.tupled, Post.unapply)
+    def * =(id,userId,messsage,createdAt,editedAt)<>((Post.apply _).tupled, Post.unapply)
   }
 
 
@@ -66,7 +66,7 @@
    def userIndex = index("idx_like_user", userId, false)
    def postIndex = index("idx_like_post",postId, false)
 
-   def * = (userId,postId)<>(Likes.tupled, Likes.unapply)
+   def * = (userId,postId)<>((Likes.apply _).tupled, Likes.unapply)
  }
 
 
@@ -83,7 +83,7 @@
    def sourceIndex = index("idx_friend_source", sourceId, false)
    def targetIndex = index("idx_friend_target", targetId, false)
 
-   def * = (id,sourceId,targetId,createdAt,status)<>(UserFriend.tupled, UserFriend.unapply)
+   def * = (id,sourceId,targetId,createdAt,status)<>((UserFriend.apply _).tupled, UserFriend.unapply)
  }
 }
 

@@ -10,8 +10,8 @@ import scala.concurrent.ExecutionContext.Implicits.global
 
 class UserFriendRepo @Inject()(tableMapping: TableMapping, protected val dbConfigProvider: DatabaseConfigProvider) extends HasDatabaseConfigProvider[JdbcProfile]{
   import profile.api._
-  val friends = tableMapping.userfriends
-  val users = tableMapping.users
+  private val friends = tableMapping.userfriends
+  private val users = tableMapping.users
 
   def sendRequest(userFriend: UserFriend) ={
     db.run((friends returning friends.map(_.id)).insertOrUpdate(userFriend))

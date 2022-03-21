@@ -1,11 +1,12 @@
 package repositories
 import akka.actor.Status.Success
-import dto.UserDTO
+import dto.{UserDTO, UserResponseDTO}
 import mapping.TableMapping
 import models.User
 import play.api.db.slick.{DatabaseConfigProvider, HasDatabaseConfigProvider}
 import slick.jdbc.JdbcProfile
 
+import java.sql.SQLIntegrityConstraintViolationException
 import javax.inject.Inject
 import scala.concurrent.ExecutionContext.Implicits.global
 
@@ -14,8 +15,10 @@ class UserRepo @Inject()(tableMapping: TableMapping, protected val dbConfigProvi
   private val users = tableMapping.users
 
   def insert(user: User) = {
-    val insertQuery = (users returning users.map(_.id)).insertOrUpdate(user)
-    dbConfig.db.run(insertQuery)
+    db.run(users += user).map(_ => UserResponseDTO(user.id,user.username,user.email,user.name,user.lastname,user.dateOfBirth,user.about,user.profilePicture)).recover{
+      case _: SQLIntegrityConstraintViolationException => throw new Exception("Username/email not unique")
+      case ex: Exception => throw ex
+    }
   }
   def findById(id: Long) ={
     db.run((for (user <- users if user.id ===id) yield  user).result.headOption)

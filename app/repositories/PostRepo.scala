@@ -1,6 +1,6 @@
 package repositories
 
-import dto.PostDTO
+import dto.{PostDTO, PostResponseDTO}
 import mapping.TableMapping
 import models.Post
 import play.api.db.slick.{DatabaseConfigProvider, HasDatabaseConfigProvider}
@@ -41,6 +41,7 @@ class PostRepo @Inject()(tableMapping: TableMapping, protected val dbConfigProvi
       user <- users if(!(user.id === userId) && ((user.id ===friendship.sourceId) || (user.id === friendship.targetId)))
       post <- posts if post.userId === user.id
       likeCount = likes.filter(_.postId===post.id).length
-    } yield(post.id, post.messsage, post.createdAt, post.editedAt,user.username, user.name, user.lastname, user.id,likeCount)).result)
+      liked = likes.filter(_.postId === post.id).filter(_.userId === user.id).length > 0
+    } yield(PostResponseDTO(post.id, post.messsage, post.createdAt, post.editedAt, user.id,user.username, user.name, user.lastname,likeCount,liked))).result)
   }
 }

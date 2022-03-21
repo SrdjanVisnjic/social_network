@@ -1,5 +1,5 @@
 package controllers
-import dto.UserDTO
+import dto.{UserDTO, UserResponseDTO}
 import models.User
 import play.api.libs.json.Format.GenericFormat
 import play.api.libs.json.{JsError, JsSuccess}
@@ -13,11 +13,15 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import play.api.Configuration
 
+import java.sql.SQLIntegrityConstraintViolationException
+
 class UserController @Inject()(val controllerComponents: ControllerComponents, val userService: UserService) extends BaseController {
 
   def create: Action[AnyContent]= Action.async{ implicit request => request.body.asJson.get.validate[User] match {
-    case JsSuccess(user,_) => userService.createUser(user)
-      Future(Ok(Json.toJson(user)))
+    case JsSuccess(user,_) => userService.createUser(user).map{
+      case userResponseDTO: UserResponseDTO => Ok(Json.toJson(userResponseDTO))
+      case _:SQLIntegrityConstraintViolationException => InternalServerError("Username/email already taken")
+    }
     case JsError(err) => Future(BadRequest("Invalid data"))
   }}
 
@@ -45,7 +49,7 @@ class UserController @Inject()(val controllerComponents: ControllerComponents, v
       val filename = Paths.get(picture.filename).getFileName
       val fileSize = picture.fileSize
       val contentType = picture.contentType
-      picture.ref.moveTo(Paths.get(s"C:/Users/Srdjan/SocialNetwork/social_network/public/images/$filename").toFile, replace = true)
+      picture.ref.moveTo(Paths.get(s"C:/Users/Srdjan/SocialNetwork/social_network/public/images/$filename$userId").toFile, replace = true)
       userService.updateProfilePic(userId,picture.filename).map{
         case true => Ok("File uploaded")
         case _ => BadRequest("File not found")

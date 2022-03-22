@@ -1,6 +1,6 @@
 package controllers
 
-import dto.PostDTO
+import dto.{PostDTO, PostResponseDTO}
 import models.{Post, User}
 import play.api.libs.json.{JsError, JsSuccess, Json}
 import play.api.mvc.{Action, AnyContent, BaseController, ControllerComponents}

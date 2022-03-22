@@ -36,12 +36,12 @@ class PostRepo @Inject()(tableMapping: TableMapping, protected val dbConfigProvi
     db.run(query.update(postdto.message,editedAt)) map {_>0}
   }
   def getPostsByUser(userId : Long) ={
-    db.run((for{
+    val query2 = for{
       friendship <- userfriends if friendship.status > 0 && (friendship.sourceId === userId || friendship.targetId ===userId)
       user <- users if(!(user.id === userId) && ((user.id ===friendship.sourceId) || (user.id === friendship.targetId)))
       post <- posts if post.userId === user.id
-      likeCount = likes.filter(_.postId===post.id).length
-    } yield PostResponseDTO(post.id, post.messsage, post.createdAt, post.editedAt, user.id,user.username, user.name, user.lastname,likeCount,likes.filter(like => like.postId === post.id && like.userId === userId).exists)).result)
-
+     // likeCount = likes.filter(_.postId===post.id).length
+    } yield {(post.id, post.messsage, post.createdAt, post.editedAt, user.id,user.username, user.name, user.lastname,likes.filter(_.postId===post.id).length,likes.filter(like => like.postId === post.id && like.userId === userId).exists)}
+    db.run(query2.sortBy(_._3.desc).result)
   }
 }

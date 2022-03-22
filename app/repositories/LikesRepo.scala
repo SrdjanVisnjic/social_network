@@ -19,7 +19,7 @@ class LikesRepo @Inject()(tableMapping: TableMapping, protected val dbConfigProv
   def insert(userId:Long, postId:Long) ={
     db.run(likes += Likes(userId,postId)).map(_=> "Post liked").recover{
       case _: SQLIntegrityConstraintViolationException => throw new Exception("Already liked")
-      case ex: Exception => throw ex
+      case err: Error => throw err
     }
   }
   def delete(userId:Long, postId:Long) ={

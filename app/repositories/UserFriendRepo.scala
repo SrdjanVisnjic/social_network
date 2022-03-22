@@ -16,11 +16,12 @@ class UserFriendRepo @Inject()(tableMapping: TableMapping, protected val dbConfi
   private val users = tableMapping.users
 
   def sendRequest(userFriend: UserFriend) ={
-    if(friends.filter(friend => (friend.targetId ===userFriend.targetId && friend.sourceId === userFriend.sourceId) || (friend.targetId === userFriend.sourceId && friend.sourceId === userFriend.targetId )).result.headOption)
-    db.run((friends returning friends.map(_.id)).insertOrUpdate(userFriend)).recover{
-      case _: SQLIntegrityConstraintViolationException => throw new Exception("Username/email not unique")
+    db.run((friends += userFriend).map(_ => userFriend)).recover{
       case ex: Exception => throw ex
     }
+  }
+  def checkIfFriendshipExists(userFriend: UserFriend)={
+    db.run(friends.filter(friend => (friend.targetId ===userFriend.targetId && friend.sourceId === userFriend.sourceId) || (friend.targetId === userFriend.sourceId && friend.sourceId === userFriend.targetId )).result.headOption)
   }
   def getFriendRequests(userId: Long) ={
     db.run((for (friendship <- friends if friendship.targetId===userId &&friendship.status===0) yield friendship).result)

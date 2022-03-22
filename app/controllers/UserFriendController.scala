@@ -12,8 +12,10 @@ import scala.concurrent.Future
 class UserFriendController @Inject()(val controllerComponents: ControllerComponents, val userFriendService : UserFriendService) extends BaseController{
 
   def create= Action.async{implicit request => request.body.asJson.get.validate[UserFriend] match {
-    case JsSuccess(friendship, _) => userFriendService.sendRequest(friendship)
-      Future( Ok("Request sent"))
+    case JsSuccess(friendship, _) => userFriendService.sendRequest(friendship) map{
+      case exception: Exception => BadRequest("Users are already friends")
+      case _ => Ok("Request sent")
+    }
     case JsError(errors) => Future(BadRequest("Request not sent"))
   }}
   def accept(friendshipId : Long) = Action.async{

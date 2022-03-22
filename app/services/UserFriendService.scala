@@ -4,11 +4,16 @@ import models.UserFriend
 import repositories.UserFriendRepo
 
 import javax.inject.Inject
+import scala.concurrent.ExecutionContext.Implicits.global
 
 class UserFriendService @Inject()(userFriendRepo: UserFriendRepo){
 
   def sendRequest(userFriend: UserFriend) ={
-    userFriendRepo.sendRequest(userFriend)
+    userFriendRepo.checkIfFriendshipExists(userFriend) map{
+      case Some(_) => throw new Exception("Users are already friends")
+      case _ => userFriendRepo.sendRequest(userFriend)
+    }
+
   }
   def getFriendRequests(userId:Long)={
     userFriendRepo.getFriendRequests(userId)

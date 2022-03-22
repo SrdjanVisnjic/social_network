@@ -20,8 +20,8 @@ class UserController @Inject()(val controllerComponents: ControllerComponents, v
 
   def create: Action[AnyContent]= Action.async{ implicit request => request.body.asJson.get.validate[User] match {
     case JsSuccess(user,_) => Try{userService.createUser(user)} match {
-      case Success(userResponseDTO: UserResponseDTO)=> Ok(Json.toJson(userResponseDTO))
-      case Failure(SQLIntegrityConstraintViolationException) => InternalServerError("Username/email already taken")
+      case Success(userResponseDTO)=> Future(Ok(Json.toJson(userResponseDTO.value.get.get)))
+      case Failure(exception) => Future(InternalServerError("Username/email already taken"))
     }
     case JsError(err) => Future(BadRequest("Invalid data"))
   }}

@@ -17,7 +17,7 @@ class UserFriendRepo @Inject()(tableMapping: TableMapping, protected val dbConfi
 
   def sendRequest(userFriend: UserFriend) ={
     db.run((friends += userFriend).map(_ => userFriend)).recover{
-      case ex: Exception => throw ex
+      case ex: Exception => throw new Exception("Could not send request")
     }
   }
   def checkIfFriendshipExists(userFriend: UserFriend)={

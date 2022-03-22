@@ -10,8 +10,8 @@ class UserFriendService @Inject()(userFriendRepo: UserFriendRepo){
 
   def sendRequest(userFriend: UserFriend) ={
     userFriendRepo.checkIfFriendshipExists(userFriend) map{
-      case Some(_) => throw new Exception("Users are already friends")
-      case _ => userFriendRepo.sendRequest(userFriend)
+      case Some(_) => throw new Exception("Already friends")
+      case _ =>  userFriendRepo.sendRequest(userFriend)
     }
 
   }

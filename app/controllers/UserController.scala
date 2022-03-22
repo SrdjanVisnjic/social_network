@@ -14,13 +14,14 @@ import scala.concurrent.Future
 import play.api.Configuration
 
 import java.sql.SQLIntegrityConstraintViolationException
+import scala.util.{Failure, Success, Try}
 
 class UserController @Inject()(val controllerComponents: ControllerComponents, val userService: UserService) extends BaseController {
 
   def create: Action[AnyContent]= Action.async{ implicit request => request.body.asJson.get.validate[User] match {
-    case JsSuccess(user,_) => userService.createUser(user).map{
-      case userResponseDTO: UserResponseDTO => Ok(Json.toJson(userResponseDTO))
-      case _:SQLIntegrityConstraintViolationException => InternalServerError("Username/email already taken")
+    case JsSuccess(user,_) => Try{userService.createUser(user)} match {
+      case Success(userResponseDTO: UserResponseDTO)=> Ok(Json.toJson(userResponseDTO))
+      case Failure(SQLIntegrityConstraintViolationException) => InternalServerError("Username/email already taken")
     }
     case JsError(err) => Future(BadRequest("Invalid data"))
   }}

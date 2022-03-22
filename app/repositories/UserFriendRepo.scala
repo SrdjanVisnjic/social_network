@@ -16,7 +16,7 @@ class UserFriendRepo @Inject()(tableMapping: TableMapping, protected val dbConfi
   private val users = tableMapping.users
 
   def sendRequest(userFriend: UserFriend) ={
-    if(friends.filter(friend => (friend.targetId ===userFriend.targetId && friend.sourceId === userFriend.sourceId) || (friend.targetId === userFriend.sourceId && friend.sourceId === userFriend.targetId )))
+    if(friends.filter(friend => (friend.targetId ===userFriend.targetId && friend.sourceId === userFriend.sourceId) || (friend.targetId === userFriend.sourceId && friend.sourceId === userFriend.targetId )).result.headOption)
     db.run((friends returning friends.map(_.id)).insertOrUpdate(userFriend)).recover{
       case _: SQLIntegrityConstraintViolationException => throw new Exception("Username/email not unique")
       case ex: Exception => throw ex

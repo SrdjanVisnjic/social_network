@@ -14,11 +14,9 @@ class UserFriendController @Inject()(val controllerComponents: ControllerCompone
 
   def create= Action.async{implicit request => request.body.asJson.get.validate[UserFriend] match {
     case JsSuccess(friendship, _) =>
-      Try{userFriendService.sendRequest(friendship)
-    } match {
-      case Failure(e) => Future(BadRequest("Users are already friends"))
-      case Success(s) => Future(Ok("Request sent"))
-    }
+      userFriendService.sendRequest(friendship).map{
+        case _ => Ok("Request sent")
+      }.recover{case ex => BadRequest("Users are already friends")}
     case JsError(errors) => Future(BadRequest("Request not sent"))
   }}
   def accept(friendshipId : Long) = Action.async{

@@ -9,7 +9,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 class UserFriendService @Inject()(userFriendRepo: UserFriendRepo){
 
   def sendRequest(userFriend: UserFriend) ={
-    userFriendRepo.checkIfFriendshipExists(userFriend) map{
+    userFriendRepo.checkIfFriendshipExists(userFriend).flatMap{
       case Some(_) => throw new Exception("Already friends")
       case _ =>  userFriendRepo.sendRequest(userFriend)
     }

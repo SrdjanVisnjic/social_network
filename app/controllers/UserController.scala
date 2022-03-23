@@ -19,10 +19,9 @@ import scala.util.{Failure, Success, Try}
 class UserController @Inject()(val controllerComponents: ControllerComponents, val userService: UserService) extends BaseController {
 
   def create: Action[AnyContent]= Action.async{ implicit request => request.body.asJson.get.validate[User] match {
-    case JsSuccess(user,_) => Try{userService.createUser(user)} match {
-      case Success(userResponseDTO)=> Future(Ok(Json.toJson(userResponseDTO.value.get.get)))
-      case Failure(exception) => Future(InternalServerError("Username/email already taken"))
-    }
+    case JsSuccess(user,_) => userService.createUser(user) .map{
+      case _ => Ok("Request sent")
+    }.recover{case ex => BadRequest("Username/email already taken")}
     case JsError(err) => Future(BadRequest("Invalid data"))
   }}
 

@@ -1,5 +1,6 @@
 package services
 
+import dto.FriendRequest
 import models.UserFriend
 import repositories.UserFriendRepo
 
@@ -16,7 +17,11 @@ class UserFriendService @Inject()(userFriendRepo: UserFriendRepo){
 
   }
   def getFriendRequests(userId:Long)={
-    userFriendRepo.getFriendRequests(userId)
+    userFriendRepo.getFriendRequests(userId).map{
+      seq => seq.map{
+        case(id, name, lastname, username, profilePicture) => FriendRequest(id,name,lastname,username,profilePicture)
+      }
+    }
   }
   def acceptRequest(friendshipId:Long)={
     userFriendRepo.acceptRequest(friendshipId)

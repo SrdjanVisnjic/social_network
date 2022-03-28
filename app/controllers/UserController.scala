@@ -36,9 +36,9 @@ class UserController @Inject()(val controllerComponents: ControllerComponents, v
   implicit request =>
      request.body.asJson.get.validate[UserDTO] match{
        case JsSuccess(userDto,_)=>userService.update(userId,userDto).map{
-         case 1 => Ok("User updated")
-         case 0 => BadRequest("error")
-       }
+         case _ => Ok("User updated")
+
+       }.recover{case ex => BadRequest("Username/email already taken")}
          //Future(Ok("User updated"))
        case JsError(err) => Future(BadRequest("Error updating user"))
      }

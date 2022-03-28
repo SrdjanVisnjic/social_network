@@ -40,5 +40,9 @@ class UserRepo @Inject()(tableMapping: TableMapping, protected val dbConfigProvi
     db.run(users.filter(user => user.id === id)
       .map(u=>(u.username,u.email,u.name,u.lastname,u.dateOfBirth,u.about))
       .update(userDto.username, userDto.email,userDto.name,userDto.lastname, userDto.dateOfBirth,userDto.about))
+      .recover{
+        case _: SQLIntegrityConstraintViolationException => throw new Exception("Username/email not unique")
+        case ex: Exception => throw ex
+      }
   }
 }

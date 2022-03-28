@@ -24,7 +24,8 @@ class UserFriendRepo @Inject()(tableMapping: TableMapping, protected val dbConfi
     db.run(friends.filter(friend => (friend.targetId ===userFriend.targetId && friend.sourceId === userFriend.sourceId) || (friend.targetId === userFriend.sourceId && friend.sourceId === userFriend.targetId )).result.headOption)
   }
   def getFriendRequests(userId: Long) ={
-    db.run((for (friendship <- friends if friendship.targetId===userId &&friendship.status===0) yield friendship).result)
+    db.run((for {friendship <- friends if friendship.targetId===userId &&friendship.status===0
+                 user <- users if user.id === friendship.sourceId} yield (friendship.id,user.name,user.lastname,user.username,user.profilePicture)).result)
   }
   def acceptRequest(friendshipId: Long) ={
     val query = for(friend <- friends if friend.id === friendshipId && friend.status===0) yield (friend.status,friend.createdAt)

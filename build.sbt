@@ -13,7 +13,7 @@ libraryDependencies += "mysql" % "mysql-connector-java" % "8.0.28"
 libraryDependencies += "com.typesafe.play" %% "play-slick" % "5.0.0"
 libraryDependencies += "com.typesafe.play" %% "play-slick-evolutions" % "5.0.0"
 libraryDependencies += "mysql" % "mysql-connector-java" % "8.0.25"
-
+libraryDependencies +=  "org.webjars.npm" % "github-com-mui-org-material-ui" % "3.9.3"
 
 
 // Adds additional packages into Twirl

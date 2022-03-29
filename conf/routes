@@ -17,9 +17,10 @@ DELETE /post/deletePost/:postId         controllers.PostController.deletePost(po
 POST /friend/create                     controllers.UserFriendController.create()
 GET /friend/getFriendRequests/:userId          controllers.UserFriendController.getFriendRequests(userId:Long)
 PATCH /friend/accept/:friendshipId          controllers.UserFriendController.accept(friendshipId : Long)
+DELETE /friend/reject/:friendshipId     controllers.UserFriendController.reject(friendshipId : Long)
 GET /friend/getFriends/:userId          controllers.UserFriendController.getFriends(userId:Long)
 POST /likes/like/:userId/:postId        controllers.LikeController.like(userId: Long, postId: Long)
 DELETE /likes/unlike/:userId/:postId        controllers.LikeController.unlike(userId: Long, postId: Long)
 
 # Map static resources from the /public folder to the /assets URL path
-GET     /assets/*file               controllers.Assets.versioned(path="/public", file: Asset)
+GET     /assets/*file               controllers.Assets.versioned(path="/public", file: String)

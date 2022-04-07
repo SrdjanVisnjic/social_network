@@ -14,22 +14,19 @@ class UserFriendService @Inject()(userFriendRepo: UserFriendRepo){
       case Some(_) => throw new Exception("Already friends")
       case _ =>  userFriendRepo.sendRequest(userFriend)
     }
-
   }
   def getFriendRequests(userId:Long)={
     userFriendRepo.getFriendRequests(userId).map{
       seq => seq.map{
-        case(id, name, lastname, username, profilePicture) => FriendRequest(id,name,lastname,username,profilePicture)
+        case(id, name, lastname, username, profilePicture) =>
+          FriendRequest(id,name,lastname,username,profilePicture)
       }
     }
   }
   def acceptRequest(friendshipId:Long)={
-    userFriendRepo.acceptRequest(friendshipId)
-  }
+    userFriendRepo.acceptRequest(friendshipId)}
   def rejectRequest(friendshipId:Long)={
-    userFriendRepo.rejectRequest(friendshipId)
-  }
+    userFriendRepo.rejectRequest(friendshipId)}
   def getFriends(userId:Long)={
-    userFriendRepo.getFriends(userId)
-  }
+    userFriendRepo.getFriends(userId)}
 }

@@ -10,12 +10,15 @@ import java.sql.SQLIntegrityConstraintViolationException
 import javax.inject.Inject
 import scala.concurrent.ExecutionContext.Implicits.global
 
-class UserRepo @Inject()(tableMapping: TableMapping, protected val dbConfigProvider: DatabaseConfigProvider) extends HasDatabaseConfigProvider[JdbcProfile] {
+class UserRepo @Inject()(tableMapping: TableMapping,
+                         protected val dbConfigProvider: DatabaseConfigProvider)
+                          extends HasDatabaseConfigProvider[JdbcProfile] {
   import  profile.api._
   private val users = tableMapping.users
 
   def insert(user: User) = {
-    db.run(users += user).map(_ => UserResponseDTO(user.id,user.username,user.email,user.name,user.lastname,user.dateOfBirth,user.about,user.profilePicture)).recover{
+    db.run(users += user)
+      .recover{
       case _: SQLIntegrityConstraintViolationException => throw new Exception("Username/email not unique")
       case ex: Exception => throw ex
     }
@@ -23,13 +26,15 @@ class UserRepo @Inject()(tableMapping: TableMapping, protected val dbConfigProvi
   def findById(id: Long) ={
     db.run((for (user <- users if user.id ===id) yield  user).result.headOption)
   }
+
+  def searchUser(name: String, lastname: String)={
+    db.run((for(user <- users if user.name === name && user.lastname===lastname ) yield user).result)
+  }
+
   def delete(id: Long)={
     db.run(users.filter(_.id === id).delete) map {
       _ > 0
     }
-  }
-  def searchUser(name: String, lastname: String)={
-    db.run((for(user <- users if user.name === name && user.lastname===lastname ) yield user).result)
   }
 
   def updateProfilePicture(id: Long , profilePicture: String) ={

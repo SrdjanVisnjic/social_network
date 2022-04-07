@@ -15,9 +15,7 @@ class LikeController @Inject()(val controllerComponents: ControllerComponents, v
     implicit request =>
       likesService.like(userId, postId).map(_ => Ok)
         .recover{ case _: Exception => BadRequest}
-
     }
-
   def unlike(userId: Long, postId: Long) = Action.async{
     implicit request =>
       likesService.unlike(userId, postId).map(_ => Ok)

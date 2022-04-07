@@ -21,10 +21,11 @@ class PostService @Inject()(postRepo: PostRepo){
   def getPostsByUser(userId: Long)= {
     postRepo.getPostsByUser(userId).map{
       seq => seq.map {
-        case (postId, message, createdAt, editedAt, userId, username, name, lastname,likeCount,liked) => PostResponseDTO(postId,message,createdAt,editedAt, userId, username, name, lastname,likeCount,liked)
+        case (postId, message, createdAt, editedAt,
+        userId, username, name, lastname, likeCount, liked) =>
+          PostResponseDTO(postId, message, createdAt, editedAt,
+            userId, username, name, lastname, likeCount, liked)
       }
-
-
     }
   }
 }

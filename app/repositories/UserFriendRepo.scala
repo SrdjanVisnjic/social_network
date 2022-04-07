@@ -20,13 +20,6 @@ class UserFriendRepo @Inject()(tableMapping: TableMapping, protected val dbConfi
       case ex: Exception => throw new Exception("Could not send request")
     }
   }
-  def checkIfFriendshipExists(userFriend: UserFriend)={
-    db.run(friends.filter(friend => (friend.targetId ===userFriend.targetId && friend.sourceId === userFriend.sourceId) || (friend.targetId === userFriend.sourceId && friend.sourceId === userFriend.targetId )).result.headOption)
-  }
-  def getFriendRequests(userId: Long) ={
-    db.run((for {friendship <- friends if friendship.targetId===userId &&friendship.status===0
-                 user <- users if user.id === friendship.sourceId} yield (friendship.id,user.name,user.lastname,user.username,user.profilePicture)).result)
-  }
   def acceptRequest(friendshipId: Long) ={
     val query = for(friend <- friends if friend.id === friendshipId && friend.status===0) yield (friend.status,friend.createdAt)
     db.run(query.update(1,DateTime.now().toString("yyyy-MM-dd"))) map{_ > 0}
@@ -34,10 +27,22 @@ class UserFriendRepo @Inject()(tableMapping: TableMapping, protected val dbConfi
   def rejectRequest(friendshipId: Long)={
     db.run(friends.filter(_.id===friendshipId).delete) map{_>0}
   }
+
+  def getFriendRequests(userId: Long) ={
+    db.run((for {friendship <- friends if friendship.targetId===userId &&friendship.status===0
+                 user <- users if user.id === friendship.sourceId}
+    yield (friendship.id,user.name,user.lastname,user.username,user.profilePicture)).result)
+  }
   def getFriends(userId: Long)={
     db.run((for{
-      friendship <- friends if friendship.status > 0 && (friendship.sourceId === userId || friendship.targetId ===userId) //status 0 = request sent status == 1 request accepted
+      friendship <- friends if friendship.status > 0 && (friendship.sourceId === userId || friendship.targetId ===userId)
       user <- users if(!(user.id === userId) && ((user.id ===friendship.sourceId) || (user.id === friendship.targetId)))
     } yield user).result)
+  }
+
+  def checkIfFriendshipExists(userFriend: UserFriend)={
+    db.run(friends.filter(friend =>
+      (friend.targetId ===userFriend.targetId && friend.sourceId === userFriend.sourceId)
+        || (friend.targetId === userFriend.sourceId && friend.sourceId === userFriend.targetId )).result.headOption)
   }
 }
